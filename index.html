@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <!-- Adapta el ancho de la página a la pantalla del móvil o del ordenador. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de misiones - Unidad 3</title>
+    <link rel="stylesheet" href="estilos.css">
+    <!-- defer espera a que el HTML esté preparado antes de ejecutar JavaScript.
+         Así podemos acceder al botón y al párrafo aunque el script esté en head. -->
+    <script src="juego.js" defer></script>
+</head>
+<body>
+    <main>
+        <h1>Juego de misiones</h1>
+        <p>Completa pequeñas misiones y consigue puntos.</p>
+
+        <!-- Esta pantalla es la base del proyecto.
+             En el siguiente avance añadiremos el formulario del jugador. -->
+        <button id="boton-inicio" type="button">Comenzar</button>
+
+        <!-- JavaScript cambiará este mensaje al pulsar el botón.
+             aria-live permite que los lectores de pantalla anuncien el cambio. -->
+        <p id="mensaje" aria-live="polite">Pulsa Comenzar para comprobar el inicio.</p>
+    </main>
+</body>
+</html>

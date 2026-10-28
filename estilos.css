@@ -1,0 +1,53 @@
+/* Incluye el relleno y el borde dentro del ancho de cada elemento.
+   Esto evita que los elementos ocupen más espacio del esperado. */
+* {
+    box-sizing: border-box;
+}
+
+/* Estilos generales de la página: letra, fondo y separación exterior. */
+body {
+    margin: 0;
+    padding: 24px;
+    font-family: Arial, sans-serif;
+    background-color: #eef2f6;
+    color: #1f2937;
+}
+
+/* Centra el panel y limita su ancho para facilitar la lectura. */
+main {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 24px;
+    background-color: white;
+    border-radius: 12px;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+p {
+    line-height: 1.5;
+}
+
+/* El cursor indica que el botón se puede pulsar. */
+button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    background-color: #1d4ed8;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Cambia el color al pasar el ratón por encima del botón. */
+button:hover {
+    background-color: #1e40af;
+}
+
+/* Destaca el botón cuando se selecciona usando el teclado. */
+button:focus-visible {
+    outline: 3px solid #111827;
+    outline-offset: 3px;
+}
