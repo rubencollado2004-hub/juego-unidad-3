@@ -17,13 +17,15 @@
 
         <!-- Cada label se une a su campo mediante for e id.
              required indica que el campo no puede quedar vacío. -->
-        <form id="formulario-jugador">
+        <!-- novalidate deja la validación a JavaScript para mostrar nuestro mensaje. -->
+        <form id="formulario-jugador" novalidate>
             <label for="nombre">Nombre del jugador</label>
             <input id="nombre" type="text" required>
 
             <label for="fecha-nacimiento">Fecha de nacimiento</label>
             <input id="fecha-nacimiento" type="date" required>
 
+            <p>Debes tener al menos 12 años para jugar.</p>
             <button id="boton-inicio" type="submit">Comenzar</button>
         </form>
 

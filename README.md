@@ -5,16 +5,25 @@ El proyecto se construye por avances pequeños para entender y comprobar cada pa
 
 ## Estado actual
 
-Formulario de nombre y fecha de nacimiento. Al enviarlo, muestra los datos introducidos.
-La comprobación de edad y fecha se añadirá en el siguiente avance.
+Formulario con validación de nombre, fecha de nacimiento y edad mínima de 12 años.
+Con datos correctos, se oculta el formulario y aparece "Acceso permitido. Perfil creado.".
+Si los datos no son válidos, aparece exactamente "Acceso denegado" y no se continúa.
 El juego completo todavía no está implementado.
 
 ## Cómo probar este avance
 
 1. Descarga el repositorio y descomprime los archivos.
 2. Abre index.html en el navegador.
-3. Introduce un nombre y una fecha de nacimiento.
-4. Pulsa Comenzar: deben aparecer los datos sin recargar la página.
+3. Introduce un nombre y una fecha de nacimiento de alguien mayor de 12 años.
+4. Pulsa Comenzar: debe aparecer "Acceso permitido. Perfil creado.".
+5. Recarga la página para probar otro caso: nombre vacío o solo espacios, fecha vacía,
+   fecha de hoy, fecha futura o una persona menor de 12 años.
+6. En todos esos casos debe aparecer "Acceso denegado" y mantenerse el formulario.
+7. Prueba también alguien que cumple 12 años hoy (permitido) y mañana (denegado).
+
+El formulario usa novalidate para que JavaScript muestre el mensaje del enunciado,
+en lugar del aviso automático del navegador. Se puede enviar con el botón o con Enter.
+La edad se calcula teniendo en cuenta si el cumpleaños ya ha pasado este año.
 
 También puedes abrir la carpeta con Visual Studio Code y usar Live Server.
 Cuando se añadan cookies, usaremos un servidor local para probarlas correctamente.
@@ -23,13 +32,13 @@ Cuando se añadan cookies, usaremos un servidor local para probarlas correctamen
 
 - index.html: contenido de la página y carga del script en head con defer.
 - estilos.css: aspecto visual.
-- juego.js: lectura del formulario y modificación del texto mediante el DOM.
+- juego.js: validación del formulario y cálculo de la edad. Los datos válidos se guardan en nombreJugador y edadJugador para el próximo panel.
 
 ## Avances previstos
 
 - [x] 1. Estructura HTML, CSS y script en head con defer.
 - [x] 2. Formulario de nombre y fecha de nacimiento.
-- [ ] 3. Validación de nombre, fecha anterior a la actual y edad mínima; mensaje "Acceso denegado".
+- [x] 3. Validación de nombre, fecha anterior a la actual y edad mínima; mensaje "Acceso denegado".
 - [ ] 4. Panel con nombre formateado mediante String y edad calculada mediante Date.
 - [ ] 5. Estilos dinámicos según los datos del jugador.
 - [ ] 6. Misiones en un array e interacción con clics.
