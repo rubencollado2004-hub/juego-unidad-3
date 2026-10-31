@@ -51,3 +51,19 @@ button:focus-visible {
     outline: 3px solid #111827;
     outline-offset: 3px;
 }
+
+/* Coloca cada etiqueta encima de su campo y separa los datos del formulario. */
+label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+input {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 16px;
+    border: 1px solid #6b7280;
+    border-radius: 6px;
+    font: inherit;
+}

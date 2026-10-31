@@ -1,17 +1,20 @@
 "use strict";
 
-// Buscamos los elementos por su id para poder utilizarlos desde JavaScript.
-// const indica que estas referencias no se van a reasignar.
-const botonInicio = document.getElementById("boton-inicio");
+// Buscamos los elementos del HTML por su id.
+// defer permite hacerlo cuando el formulario ya está creado.
+const formularioJugador = document.getElementById("formulario-jugador");
+const campoNombre = document.getElementById("nombre");
+const campoFecha = document.getElementById("fecha-nacimiento");
 const mensaje = document.getElementById("mensaje");
 
-// Una función agrupa instrucciones. Estas se ejecutan cuando llamamos a la función.
-function mostrarInicio() {
-    // textContent cambia únicamente el texto del párrafo.
-    // Por ahora mostramos un aviso: el formulario llegará en el siguiente avance.
-    mensaje.textContent = "Inicio preparado. El siguiente paso será crear tu perfil.";
+function recogerDatos(evento) {
+    // Evita que el envío del formulario recargue la página.
+    evento.preventDefault();
+
+    // value lee lo escrito en cada campo. textContent lo muestra como texto.
+    mensaje.textContent = "Datos recogidos: " + campoNombre.value +
+        ". Fecha de nacimiento: " + campoFecha.value + ".";
 }
 
-// Registramos la función que debe ejecutarse al hacer clic.
-// No escribimos mostrarInicio() porque eso la ejecutaría al cargar la página.
-botonInicio.addEventListener("click", mostrarInicio);
+// submit funciona tanto al pulsar Comenzar como al pulsar Enter en un campo.
+formularioJugador.addEventListener("submit", recogerDatos);

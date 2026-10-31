@@ -7,21 +7,29 @@
     <title>Juego de misiones - Unidad 3</title>
     <link rel="stylesheet" href="estilos.css">
     <!-- defer espera a que el HTML esté preparado antes de ejecutar JavaScript.
-         Así podemos acceder al botón y al párrafo aunque el script esté en head. -->
+         Así podemos acceder al formulario y al párrafo aunque el script esté en head. -->
     <script src="juego.js" defer></script>
 </head>
 <body>
     <main>
         <h1>Juego de misiones</h1>
-        <p>Completa pequeñas misiones y consigue puntos.</p>
+        <p>Resuelve sumas sencillas y consigue puntos.</p>
 
-        <!-- Esta pantalla es la base del proyecto.
-             En el siguiente avance añadiremos el formulario del jugador. -->
-        <button id="boton-inicio" type="button">Comenzar</button>
+        <!-- Cada label se une a su campo mediante for e id.
+             required indica que el campo no puede quedar vacío. -->
+        <form id="formulario-jugador">
+            <label for="nombre">Nombre del jugador</label>
+            <input id="nombre" type="text" required>
+
+            <label for="fecha-nacimiento">Fecha de nacimiento</label>
+            <input id="fecha-nacimiento" type="date" required>
+
+            <button id="boton-inicio" type="submit">Comenzar</button>
+        </form>
 
         <!-- JavaScript cambiará este mensaje al pulsar el botón.
              aria-live permite que los lectores de pantalla anuncien el cambio. -->
-        <p id="mensaje" aria-live="polite">Pulsa Comenzar para comprobar el inicio.</p>
+        <p id="mensaje" aria-live="polite">Introduce tus datos y pulsa Comenzar.</p>
     </main>
 </body>
 </html>
