@@ -8,6 +8,7 @@ El proyecto se construye por avances pequeños para entender y comprobar cada pa
 Formulario con validación de nombre, fecha de nacimiento y edad mínima de 12 años.
 Con datos correctos, se oculta el formulario y aparece el panel del jugador.
 El panel muestra el nombre en mayúsculas (toUpperCase) y la edad calculada con Date.
+Su fondo es azul claro a partir de 18 años y verde claro entre 12 y 17 años.
 Si los datos no son válidos, aparece exactamente "Acceso denegado" y no se continúa.
 El juego completo todavía no está implementado.
 
@@ -22,6 +23,8 @@ El juego completo todavía no está implementado.
    fecha de hoy, fecha futura o una persona menor de 12 años.
 6. En todos esos casos debe aparecer "Acceso denegado" y mantenerse el formulario, sin mostrar el panel.
 7. Prueba también alguien que cumple 12 años hoy (permitido) y mañana (denegado).
+8. Recarga y prueba una persona de 17 años: el panel debe ser verde claro.
+   Con una persona que cumple 18 hoy, debe ser azul claro.
 
 El formulario usa novalidate para que JavaScript muestre el mensaje del enunciado,
 en lugar del aviso automático del navegador. Se puede enviar con el botón o con Enter.
@@ -42,7 +45,7 @@ Cuando se añadan cookies, usaremos un servidor local para probarlas correctamen
 - [x] 2. Formulario de nombre y fecha de nacimiento.
 - [x] 3. Validación de nombre, fecha anterior a la actual y edad mínima; mensaje "Acceso denegado".
 - [x] 4. Panel con nombre formateado mediante String y edad calculada mediante Date.
-- [ ] 5. Estilos dinámicos según los datos del jugador.
+- [x] 5. Estilos dinámicos según los datos del jugador.
 - [ ] 6. Misiones en un array e interacción con clics.
 - [ ] 7. Puntuación con números aleatorios, redondeo y otra función de Math o Number.
 - [ ] 8. Ventana adicional con información del jugador.
@@ -64,3 +67,10 @@ Cada avance debe comprenderse para poder modificarlo y explicarlo en el examen.
 Una misión será resolver una suma de dos números del 1 al 10.
 Cada acierto dará un punto y el botón Siguiente mostrará otra suma.
 Usaremos funciones cortas y comentarios claros, sin librerías.
+
+## Cómo funciona el panel
+
+- mostrarPanel usa toUpperCase para poner el nombre en mayúsculas y textContent para mostrarlo.
+- calcularEdad usa getFullYear, getMonth y getDate para tener en cuenta el cumpleaños.
+- cambiarColorPanel usa un if/else y style.backgroundColor para elegir el fondo según la edad.
+- hidden mantiene el panel oculto hasta que se valida el formulario.

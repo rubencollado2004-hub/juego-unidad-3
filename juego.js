@@ -30,6 +30,16 @@ function calcularEdad(nacimiento, hoy) {
     return edad;
 }
 
+function cambiarColorPanel() {
+    // style.backgroundColor cambia el fondo del panel desde JavaScript.
+    // Usamos un if/else sencillo: azul para mayores de edad y verde para menores.
+    if (edadJugador >= 18) {
+        panelJugador.style.backgroundColor = "#dbeafe"; // Azul claro.
+    } else {
+        panelJugador.style.backgroundColor = "#dcfce7"; // Verde claro.
+    }
+}
+
 function mostrarPanel() {
     // toUpperCase es un método de String: convierte el nombre a mayúsculas.
     // textContent muestra texto, sin interpretar lo escrito como código HTML.
@@ -37,6 +47,7 @@ function mostrarPanel() {
 
     // La edad ya se calculó con los métodos de Date en calcularEdad.
     textoEdad.textContent = "Edad: " + edadJugador + " años";
+    cambiarColorPanel();
     panelJugador.hidden = false; // Hace visible el panel.
 }
 
