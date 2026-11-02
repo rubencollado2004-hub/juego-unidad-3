@@ -5,6 +5,9 @@ const formularioJugador = document.getElementById("formulario-jugador");
 const campoNombre = document.getElementById("nombre");
 const campoFecha = document.getElementById("fecha-nacimiento");
 const mensaje = document.getElementById("mensaje");
+const panelJugador = document.getElementById("panel-jugador");
+const textoNombre = document.getElementById("nombre-jugador");
+const textoEdad = document.getElementById("edad-jugador");
 const EDAD_MINIMA = 12;
 
 // Guardaremos estos datos solo cuando el perfil sea válido.
@@ -25,6 +28,16 @@ function calcularEdad(nacimiento, hoy) {
     }
 
     return edad;
+}
+
+function mostrarPanel() {
+    // toUpperCase es un método de String: convierte el nombre a mayúsculas.
+    // textContent muestra texto, sin interpretar lo escrito como código HTML.
+    textoNombre.textContent = "Jugador: " + nombreJugador.toUpperCase();
+
+    // La edad ya se calculó con los métodos de Date en calcularEdad.
+    textoEdad.textContent = "Edad: " + edadJugador + " años";
+    panelJugador.hidden = false; // Hace visible el panel.
 }
 
 function validarPerfil(evento) {
@@ -66,7 +79,7 @@ function validarPerfil(evento) {
     edadJugador = edad;
     formularioJugador.hidden = true;
     mensaje.textContent = "Acceso permitido. Perfil creado.";
-    // En el próximo avance mostraremos el panel con el nombre y la edad.
+    mostrarPanel();
 }
 
 // La función se ejecuta al enviar el formulario, no al cargar la página.

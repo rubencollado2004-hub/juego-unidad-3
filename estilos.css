@@ -67,3 +67,12 @@ input {
     border-radius: 6px;
     font: inherit;
 }
+
+/* Separa el panel del mensaje y deja espacio alrededor de los datos. */
+#panel-jugador {
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid #6b7280;
+    border-radius: 6px;
+    overflow-wrap: anywhere; /* Evita que un nombre largo se salga del panel. */
+}
