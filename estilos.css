@@ -76,3 +76,19 @@ input {
     border-radius: 6px;
     overflow-wrap: anywhere; /* Evita que un nombre largo se salga del panel. */
 }
+
+/* Deja separación entre botones y permite leer un historial largo. */
+#zona-juego {
+    margin-top: 24px;
+    overflow-wrap: anywhere;
+}
+
+#zona-juego button {
+    margin-bottom: 8px;
+}
+
+/* Un botón gris indica que la suma ya se ha acertado. */
+button:disabled {
+    background-color: #6b7280;
+    cursor: default;
+}

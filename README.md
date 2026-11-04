@@ -10,7 +10,8 @@ Con datos correctos, se oculta el formulario y aparece el panel del jugador.
 El panel muestra el nombre en mayúsculas (toUpperCase) y la edad calculada con Date.
 Su fondo es azul claro a partir de 18 años y verde claro entre 12 y 17 años.
 Si los datos no son válidos, aparece exactamente "Acceso denegado" y no se continúa.
-El juego completo todavía no está implementado.
+Ya se pueden resolver sumas del 1 al 10 y consultar las acertadas en un historial.
+La puntuación y el almacenamiento se añadirán en los siguientes avances.
 
 ## Cómo probar este avance
 
@@ -46,7 +47,7 @@ Cuando se añadan cookies, usaremos un servidor local para probarlas correctamen
 - [x] 3. Validación de nombre, fecha anterior a la actual y edad mínima; mensaje "Acceso denegado".
 - [x] 4. Panel con nombre formateado mediante String y edad calculada mediante Date.
 - [x] 5. Estilos dinámicos según los datos del jugador.
-- [ ] 6. Misiones en un array e interacción con clics.
+- [x] 6. Misiones en un array e interacción con clics.
 - [ ] 7. Puntuación con números aleatorios, redondeo y otra función de Math o Number.
 - [ ] 8. Ventana adicional con información del jugador.
 - [ ] 9. Guardado de la partida actual en sessionStorage.
@@ -59,7 +60,7 @@ Cuando se añadan cookies, usaremos un servidor local para probarlas correctamen
 El enunciado exige al menos 10 commits y un commit cada semana desde su publicación.
 Los cambios deben subirse a GitHub de forma gradual.
 Entrega prevista: 9 de noviembre de 2026 a las 10:13 (hora de Madrid).
-Próximos avances: 4, 6 y 8 de noviembre. La revisión final queda para el día 8.
+Próximos avances: 6 y 8 de noviembre. La revisión final queda para el día 8.
 Cada avance debe comprenderse para poder modificarlo y explicarlo en el examen.
 
 ## Idea del juego
@@ -74,3 +75,15 @@ Usaremos funciones cortas y comentarios claros, sin librerías.
 - calcularEdad usa getFullYear, getMonth y getDate para tener en cuenta el cumpleaños.
 - cambiarColorPanel usa un if/else y style.backgroundColor para elegir el fondo según la edad.
 - hidden mantiene el panel oculto hasta que se valida el formulario.
+
+## Cómo probar las misiones
+
+1. Crea un perfil válido: aparecerá una suma de dos números del 1 al 10.
+2. Pulsa Comprobar sin responder: debe pedir un número entero.
+3. Escribe una respuesta incorrecta: puedes volver a intentarlo.
+4. Acierta: la suma se añade una sola vez al historial y Comprobar queda desactivado.
+5. Pulsa Siguiente: aparece una nueva misión y se vacía la respuesta.
+   Puedes saltar una suma; al ser aleatorias, dos misiones pueden coincidir.
+
+El array historial guarda las sumas acertadas. push añade cada suma y join muestra la lista.
+Comprobar también funciona con Enter. resuelta evita registrar dos veces la misma misión.
