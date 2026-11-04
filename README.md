@@ -11,7 +11,8 @@ El panel muestra el nombre en mayúsculas (toUpperCase) y la edad calculada con 
 Su fondo es azul claro a partir de 18 años y verde claro entre 12 y 17 años.
 Si los datos no son válidos, aparece exactamente "Acceso denegado" y no se continúa.
 Ya se pueden resolver sumas del 1 al 10 y consultar las acertadas en un historial.
-La puntuación y el almacenamiento se añadirán en los siguientes avances.
+Cada acierto da 1 punto. Fallar o saltar una suma no resta puntos.
+Todavía falta la ventana de ayuda y el almacenamiento: recargar reinicia el juego.
 
 ## Cómo probar este avance
 
@@ -48,7 +49,7 @@ Cuando se añadan cookies, usaremos un servidor local para probarlas correctamen
 - [x] 4. Panel con nombre formateado mediante String y edad calculada mediante Date.
 - [x] 5. Estilos dinámicos según los datos del jugador.
 - [x] 6. Misiones en un array e interacción con clics.
-- [ ] 7. Puntuación con números aleatorios, redondeo y otra función de Math o Number.
+- [x] 7. Puntuación con números aleatorios, redondeo y otra función de Math o Number.
 - [ ] 8. Ventana adicional con información del jugador.
 - [ ] 9. Guardado de la partida actual en sessionStorage.
 - [ ] 10. Persistencia de récord o progreso en localStorage.
@@ -65,8 +66,8 @@ Cada avance debe comprenderse para poder modificarlo y explicarlo en el examen.
 
 ## Idea del juego
 
-Una misión será resolver una suma de dos números del 1 al 10.
-Cada acierto dará un punto y el botón Siguiente mostrará otra suma.
+Una misión consiste en resolver una suma de dos números del 1 al 10.
+Cada acierto da un punto y el botón Siguiente muestra otra suma.
 Usaremos funciones cortas y comentarios claros, sin librerías.
 
 ## Cómo funciona el panel
@@ -87,3 +88,11 @@ Usaremos funciones cortas y comentarios claros, sin librerías.
 
 El array historial guarda las sumas acertadas. push añade cada suma y join muestra la lista.
 Comprobar también funciona con Enter. resuelta evita registrar dos veces la misma misión.
+
+## Puntuación y números
+
+- puntuacion empieza en 0 y aumenta en 1 al acertar una misión.
+- resuelta impide sumar de nuevo al pulsar Enter o volver a comprobar la misma misión.
+- Math.random genera el azar y Math.floor redondea hacia abajo para obtener enteros del 1 al 10.
+- Number convierte la respuesta a número y Number.isInteger comprueba que sea un entero.
+- Comprueba que dos aciertos den 2 puntos; fallar, dejar vacío o pulsar Siguiente no debe sumar.

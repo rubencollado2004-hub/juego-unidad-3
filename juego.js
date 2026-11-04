@@ -16,6 +16,7 @@ const botonComprobar = document.getElementById("boton-comprobar");
 const botonSiguiente = document.getElementById("boton-siguiente");
 const mensajeJuego = document.getElementById("mensaje-juego");
 const textoHistorial = document.getElementById("historial");
+const textoPuntuacion = document.getElementById("puntuacion");
 const EDAD_MINIMA = 12;
 
 // Guardaremos estos datos solo cuando el perfil sea válido.
@@ -25,6 +26,7 @@ let edadJugador = 0;
 let numero1 = 0;
 let numero2 = 0;
 let resuelta = false;
+let puntuacion = 0;
 
 // Un array guarda varios datos. Aquí añadiremos las sumas acertadas.
 const historial = [];
@@ -146,7 +148,10 @@ function comprobarRespuesta(evento) {
         // push añade un dato al final del array; join une los datos para mostrarlos.
         historial.push(numero1 + " + " + numero2 + " = " + respuesta);
         textoHistorial.textContent = historial.join(" | ");
-        mensajeJuego.textContent = "¡Correcto! Pulsa Siguiente.";
+        // Solo sumamos aquí: el control de resuelta impide repetir el punto.
+        puntuacion = puntuacion + 1;
+        textoPuntuacion.textContent = "Puntos: " + puntuacion;
+        mensajeJuego.textContent = "¡Correcto! Has ganado 1 punto. Pulsa Siguiente.";
     } else {
         mensajeJuego.textContent = "No es correcto. Inténtalo otra vez.";
     }
