@@ -13,20 +13,21 @@ Si los datos no son válidos, aparece exactamente "Acceso denegado" y no se cont
 Ya se pueden resolver sumas del 1 al 10 y consultar las acertadas en un historial.
 Cada acierto da 1 punto. Fallar o saltar una suma no resta puntos.
 El botón Ayuda abre una ventana con las instrucciones, tu nombre y los puntos actuales.
-Todavía falta el almacenamiento: recargar reinicia el juego.
+La partida se recupera al recargar la misma pestaña mediante sessionStorage.
+Faltan el récord persistente, las cookies y la revisión final.
 
 ## Cómo probar este avance
 
 1. Descarga el repositorio y descomprime los archivos.
-2. Abre index.html en el navegador.
+2. Abre la carpeta en VS Code y ejecuta index.html con Live Server (servidor local).
 3. Introduce un nombre y una fecha de nacimiento de alguien mayor de 12 años.
 4. Pulsa Comenzar: debe aparecer "Acceso permitido. Perfil creado." y el panel.
    Si escribes "  Rubén  ", el panel muestra "Jugador: RUBÉN" y su edad en años.
-5. Recarga la página para probar otro caso: nombre vacío o solo espacios, fecha vacía,
+5. Pulsa Nueva partida para probar otro caso: nombre vacío o solo espacios, fecha vacía,
    fecha de hoy, fecha futura o una persona menor de 12 años.
 6. En todos esos casos debe aparecer "Acceso denegado" y mantenerse el formulario, sin mostrar el panel.
 7. Prueba también alguien que cumple 12 años hoy (permitido) y mañana (denegado).
-8. Recarga y prueba una persona de 17 años: el panel debe ser verde claro.
+8. Pulsa Nueva partida y prueba una persona de 17 años: el panel debe ser verde claro.
    Con una persona que cumple 18 hoy, debe ser azul claro.
 
 El formulario usa novalidate para que JavaScript muestre el mensaje del enunciado,
@@ -52,7 +53,7 @@ Cuando se añadan cookies, usaremos un servidor local para probarlas correctamen
 - [x] 6. Misiones en un array e interacción con clics.
 - [x] 7. Puntuación con números aleatorios, redondeo y otra función de Math o Number.
 - [x] 8. Ventana adicional con información del jugador.
-- [ ] 9. Guardado de la partida actual en sessionStorage.
+- [x] 9. Guardado de la partida actual en sessionStorage.
 - [ ] 10. Persistencia de récord o progreso en localStorage.
 - [ ] 11. Preferencia guardada y recuperada mediante cookies.
 - [ ] 12. Comprobación final, correcciones y documentación.
@@ -62,7 +63,7 @@ Cuando se añadan cookies, usaremos un servidor local para probarlas correctamen
 El enunciado exige al menos 10 commits y un commit cada semana desde su publicación.
 Los cambios deben subirse a GitHub de forma gradual.
 Entrega prevista: 9 de noviembre de 2026 a las 10:13 (hora de Madrid).
-Próximos avances: 6 y 8 de noviembre. La revisión final queda para el día 8.
+Próximo avance: 8 de noviembre. La revisión final queda para el día 8.
 Cada avance debe comprenderse para poder modificarlo y explicarlo en el examen.
 
 ## Idea del juego
@@ -103,3 +104,17 @@ Comprobar también funciona con Enter. resuelta evita registrar dos veces la mis
 Pulsa Ayuda después de crear el perfil. Debe abrirse una ventana con tu nombre y puntuación.
 Ciérrala, consigue otro punto y vuelve a abrirla para comprobar la actualización.
 Si el navegador la bloquea, aparecerá un aviso para permitir ventanas emergentes.
+
+## Guardado de la partida
+
+sessionStorage conserva el perfil, los puntos, la suma actual, si está resuelta y el historial
+al recargar la misma pestaña. No es un guardado permanente: la sesión normalmente termina
+al cerrar la pestaña (el navegador puede recuperarla al restaurar una sesión).
+La respuesta que aún estés escribiendo no se guarda.
+
+1. Acierta una suma y recarga: debes conservar el punto y el historial.
+2. Intenta comprobar esa misma suma: no debe sumar otro punto.
+3. Pulsa Siguiente y recarga antes de contestar: debe conservarse esa nueva suma pendiente.
+4. Pulsa Nueva partida: vuelve el formulario y se borran los puntos de esa partida.
+
+Usa siempre el mismo servidor local y puerto para probar el almacenamiento.

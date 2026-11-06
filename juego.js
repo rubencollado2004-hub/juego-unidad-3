@@ -18,6 +18,8 @@ const mensajeJuego = document.getElementById("mensaje-juego");
 const textoHistorial = document.getElementById("historial");
 const textoPuntuacion = document.getElementById("puntuacion");
 const botonAyuda = document.getElementById("boton-ayuda");
+const botonReiniciar = document.getElementById("boton-reiniciar");
+const mensajeGuardado = document.getElementById("mensaje-guardado");
 const EDAD_MINIMA = 12;
 
 // Guardaremos estos datos solo cuando el perfil sea válido.
@@ -30,7 +32,7 @@ let resuelta = false;
 let puntuacion = 0;
 
 // Un array guarda varios datos. Aquí añadiremos las sumas acertadas.
-const historial = [];
+let historial = [];
 
 function calcularEdad(nacimiento, hoy) {
     // Primero restamos los años. Luego comprobamos si ya ha cumplido años.
@@ -127,6 +129,7 @@ function siguienteMision() {
     botonComprobar.disabled = false;
     mensajeJuego.textContent = "";
     campoRespuesta.focus();
+    guardarPartida();
 }
 
 function comprobarRespuesta(evento) {
@@ -153,6 +156,7 @@ function comprobarRespuesta(evento) {
         puntuacion = puntuacion + 1;
         textoPuntuacion.textContent = "Puntos: " + puntuacion;
         mensajeJuego.textContent = "¡Correcto! Has ganado 1 punto. Pulsa Siguiente.";
+        guardarPartida();
     } else {
         mensajeJuego.textContent = "No es correcto. Inténtalo otra vez.";
     }
@@ -180,3 +184,78 @@ function abrirAyuda() {
 }
 
 botonAyuda.addEventListener("click", abrirAyuda);
+
+function guardarPartida() {
+    // Un objeto agrupa los datos de la partida con nombres fáciles de reconocer.
+    const partida = {
+        nombre: nombreJugador, edad: edadJugador, puntos: puntuacion,
+        numero1: numero1, numero2: numero2, resuelta: resuelta, historial: historial
+    };
+    try {
+        // sessionStorage guarda texto en esta pestaña. JSON.stringify convierte el objeto a texto.
+        sessionStorage.setItem("partidaSumas", JSON.stringify(partida));
+        mensajeGuardado.textContent = "Partida guardada en esta pestaña.";
+    } catch (error) {
+        // Si el navegador bloquea el almacenamiento, se puede seguir jugando.
+        mensajeGuardado.textContent = "No se ha podido guardar la partida.";
+    }
+}
+
+function cargarPartida() {
+    try {
+        const guardada = sessionStorage.getItem("partidaSumas");
+        if (!guardada) {
+            return; // Si no hay partida, dejamos visible el formulario inicial.
+        }
+        // JSON.parse convierte el texto guardado otra vez en un objeto.
+        const partida = JSON.parse(guardada);
+        // Comprobaciones básicas para no cargar datos incompletos o dañados.
+        if (!partida || typeof partida.nombre !== "string" || partida.nombre.trim() === "" ||
+            !Number.isInteger(partida.edad) || partida.edad < EDAD_MINIMA ||
+            !Number.isInteger(partida.puntos) || partida.puntos < 0 ||
+            !Number.isInteger(partida.numero1) || partida.numero1 < 1 || partida.numero1 > 10 ||
+            !Number.isInteger(partida.numero2) || partida.numero2 < 1 || partida.numero2 > 10 ||
+            typeof partida.resuelta !== "boolean" || !Array.isArray(partida.historial) ||
+            partida.puntos !== partida.historial.length) {
+            return;
+        }
+
+        nombreJugador = partida.nombre;
+        edadJugador = partida.edad;
+        puntuacion = partida.puntos;
+        numero1 = partida.numero1;
+        numero2 = partida.numero2;
+        resuelta = partida.resuelta;
+        historial = partida.historial;
+        formularioJugador.hidden = true;
+        mostrarPanel();
+        zonaJuego.hidden = false;
+        textoSuma.textContent = numero1 + " + " + numero2 + " = ?";
+        textoPuntuacion.textContent = "Puntos: " + puntuacion;
+        if (historial.length > 0) {
+            textoHistorial.textContent = historial.join(" | ");
+        }
+        // Restaurar resuelta impide ganar otra vez el punto después de recargar.
+        botonComprobar.disabled = resuelta;
+        mensaje.textContent = "Partida recuperada.";
+        if (resuelta) {
+            mensajeJuego.textContent = "Esta suma ya está resuelta. Pulsa Siguiente.";
+        }
+    } catch (error) {
+        mensaje.textContent = "No se pudo recuperar la partida. Introduce tus datos.";
+    }
+}
+
+function reiniciarPartida() {
+    try {
+        // Solo borramos nuestra partida, no otros datos de la pestaña.
+        sessionStorage.removeItem("partidaSumas");
+        window.location.reload();
+    } catch (error) {
+        mensajeGuardado.textContent = "No se ha podido borrar la partida guardada.";
+    }
+}
+
+botonReiniciar.addEventListener("click", reiniciarPartida);
+// Se ejecuta al cargar la página: recupera la misma suma sin generar otra.
+cargarPartida();
