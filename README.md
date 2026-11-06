@@ -12,7 +12,8 @@ Su fondo es azul claro a partir de 18 años y verde claro entre 12 y 17 años.
 Si los datos no son válidos, aparece exactamente "Acceso denegado" y no se continúa.
 Ya se pueden resolver sumas del 1 al 10 y consultar las acertadas en un historial.
 Cada acierto da 1 punto. Fallar o saltar una suma no resta puntos.
-Todavía falta la ventana de ayuda y el almacenamiento: recargar reinicia el juego.
+El botón Ayuda abre una ventana con las instrucciones, tu nombre y los puntos actuales.
+Todavía falta el almacenamiento: recargar reinicia el juego.
 
 ## Cómo probar este avance
 
@@ -50,7 +51,7 @@ Cuando se añadan cookies, usaremos un servidor local para probarlas correctamen
 - [x] 5. Estilos dinámicos según los datos del jugador.
 - [x] 6. Misiones en un array e interacción con clics.
 - [x] 7. Puntuación con números aleatorios, redondeo y otra función de Math o Number.
-- [ ] 8. Ventana adicional con información del jugador.
+- [x] 8. Ventana adicional con información del jugador.
 - [ ] 9. Guardado de la partida actual en sessionStorage.
 - [ ] 10. Persistencia de récord o progreso en localStorage.
 - [ ] 11. Preferencia guardada y recuperada mediante cookies.
@@ -96,3 +97,9 @@ Comprobar también funciona con Enter. resuelta evita registrar dos veces la mis
 - Math.random genera el azar y Math.floor redondea hacia abajo para obtener enteros del 1 al 10.
 - Number convierte la respuesta a número y Number.isInteger comprueba que sea un entero.
 - Comprueba que dos aciertos den 2 puntos; fallar, dejar vacío o pulsar Siguiente no debe sumar.
+
+## Ventana de ayuda
+
+Pulsa Ayuda después de crear el perfil. Debe abrirse una ventana con tu nombre y puntuación.
+Ciérrala, consigue otro punto y vuelve a abrirla para comprobar la actualización.
+Si el navegador la bloquea, aparecerá un aviso para permitir ventanas emergentes.

@@ -17,6 +17,7 @@ const botonSiguiente = document.getElementById("boton-siguiente");
 const mensajeJuego = document.getElementById("mensaje-juego");
 const textoHistorial = document.getElementById("historial");
 const textoPuntuacion = document.getElementById("puntuacion");
+const botonAyuda = document.getElementById("boton-ayuda");
 const EDAD_MINIMA = 12;
 
 // Guardaremos estos datos solo cuando el perfil sea válido.
@@ -162,3 +163,20 @@ formularioJugador.addEventListener("submit", validarPerfil);
 
 formularioRespuesta.addEventListener("submit", comprobarRespuesta);
 botonSiguiente.addEventListener("click", siguienteMision);
+
+function abrirAyuda() {
+    // Abrimos la ventana directamente desde el clic para evitar bloqueos.
+    const ventana = window.open("", "_blank", "width=450,height=400");
+    if (!ventana) {
+        mensajeJuego.textContent = "Permite las ventanas emergentes para ver la ayuda.";
+        return;
+    }
+
+    // El HTML es fijo. El nombre se escribe después con textContent, de forma segura.
+    ventana.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Ayuda</title></head><body><h1>Cómo jugar</h1><p id="datos"></p><p>Suma los dos números y pulsa Comprobar. Cada acierto da 1 punto.</p><p>Si fallas, puedes volver a intentarlo. Siguiente muestra otra suma.</p><p>Cada suma solo puede dar un punto. Puedes cerrar esta ventana para seguir jugando.</p></body></html>');
+    ventana.document.close();
+    ventana.document.getElementById("datos").textContent =
+        "Jugador: " + nombreJugador + ". Puntos actuales: " + puntuacion + ".";
+}
+
+botonAyuda.addEventListener("click", abrirAyuda);
