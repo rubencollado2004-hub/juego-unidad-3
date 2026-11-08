@@ -14,7 +14,7 @@ Ya se pueden resolver sumas del 1 al 10 y consultar las acertadas en un historia
 Cada acierto da 1 punto. Fallar o saltar una suma no resta puntos.
 El botón Ayuda abre una ventana con las instrucciones, tu nombre y los puntos actuales.
 La partida se recupera al recargar la misma pestaña mediante sessionStorage.
-Faltan el récord persistente, las cookies y la revisión final.
+El récord se conserva con localStorage. Faltan las cookies y la revisión final.
 
 ## Cómo probar este avance
 
@@ -54,7 +54,7 @@ Cuando se añadan cookies, usaremos un servidor local para probarlas correctamen
 - [x] 7. Puntuación con números aleatorios, redondeo y otra función de Math o Number.
 - [x] 8. Ventana adicional con información del jugador.
 - [x] 9. Guardado de la partida actual en sessionStorage.
-- [ ] 10. Persistencia de récord o progreso en localStorage.
+- [x] 10. Persistencia de récord o progreso en localStorage.
 - [ ] 11. Preferencia guardada y recuperada mediante cookies.
 - [ ] 12. Comprobación final, correcciones y documentación.
 
@@ -118,3 +118,11 @@ La respuesta que aún estés escribiendo no se guarda.
 4. Pulsa Nueva partida: vuelve el formulario y se borran los puntos de esa partida.
 
 Usa siempre el mismo servidor local y puerto para probar el almacenamiento.
+
+## Récord permanente
+
+localStorage guarda recordSumas como texto. Number lo convierte a número y Math.max
+elige el mayor entre el récord anterior y los puntos actuales. Nueva partida no borra el récord.
+Prueba dos aciertos, reinicia y comprueba que los puntos sean 0 y el récord siga en 2.
+Cierra y vuelve a abrir el mismo servidor y puerto: el récord debe continuar.
+Si el navegador bloquea el guardado, aparece un aviso y puedes seguir jugando.

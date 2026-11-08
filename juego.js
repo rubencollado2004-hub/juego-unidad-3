@@ -20,6 +20,8 @@ const textoPuntuacion = document.getElementById("puntuacion");
 const botonAyuda = document.getElementById("boton-ayuda");
 const botonReiniciar = document.getElementById("boton-reiniciar");
 const mensajeGuardado = document.getElementById("mensaje-guardado");
+const textoRecord = document.getElementById("record");
+const mensajeRecord = document.getElementById("mensaje-record");
 const EDAD_MINIMA = 12;
 
 // Guardaremos estos datos solo cuando el perfil sea válido.
@@ -30,6 +32,7 @@ let numero1 = 0;
 let numero2 = 0;
 let resuelta = false;
 let puntuacion = 0;
+let record = 0;
 
 // Un array guarda varios datos. Aquí añadiremos las sumas acertadas.
 let historial = [];
@@ -156,6 +159,7 @@ function comprobarRespuesta(evento) {
         puntuacion = puntuacion + 1;
         textoPuntuacion.textContent = "Puntos: " + puntuacion;
         mensajeJuego.textContent = "¡Correcto! Has ganado 1 punto. Pulsa Siguiente.";
+        actualizarRecord();
         guardarPartida();
     } else {
         mensajeJuego.textContent = "No es correcto. Inténtalo otra vez.";
@@ -259,3 +263,33 @@ function reiniciarPartida() {
 botonReiniciar.addEventListener("click", reiniciarPartida);
 // Se ejecuta al cargar la página: recupera la misma suma sin generar otra.
 cargarPartida();
+
+// localStorage conserva el récord aunque cierres el navegador.
+// Number convierte el texto guardado a número; rechazamos valores dañados.
+function cargarRecord() {
+    try {
+        const guardado = Number(localStorage.getItem("recordSumas"));
+        if (Number.isInteger(guardado) && guardado >= 0) {
+            record = guardado;
+        }
+    } catch (error) {
+        mensajeRecord.textContent = "No se pudo leer el récord guardado.";
+    }
+    textoRecord.textContent = "Récord: " + record;
+}
+
+function actualizarRecord() {
+    // Math.max elige el mayor: una partida con menos puntos no reduce el récord.
+    record = Math.max(record, puntuacion);
+    textoRecord.textContent = "Récord: " + record;
+    try {
+        localStorage.setItem("recordSumas", String(record));
+        mensajeRecord.textContent = "";
+    } catch (error) {
+        mensajeRecord.textContent = "El récord solo se conservará mientras esta página siga abierta.";
+    }
+}
+
+// Se carga después de recuperar la partida para incluir sus puntos en el récord.
+cargarRecord();
+actualizarRecord();
