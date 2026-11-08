@@ -293,3 +293,49 @@ function actualizarRecord() {
 // Se carga después de recuperar la partida para incluir sus puntos en el récord.
 cargarRecord();
 actualizarRecord();
+
+// La cookie guarda solo una preferencia, nunca el nombre ni la fecha de nacimiento.
+const selectorLetra = document.getElementById("tamano-letra");
+const mensajePreferencia = document.getElementById("mensaje-preferencia");
+
+function aplicarLetra() {
+    if (selectorLetra.value === "grande") {
+        document.body.style.fontSize = "20px";
+    } else {
+        document.body.style.fontSize = "16px";
+    }
+}
+
+function cargarPreferencia() {
+    // document.cookie devuelve las cookies juntas, separadas por punto y coma.
+    // split crea un array; trim quita los espacios que separan cada cookie.
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i = i + 1) {
+        if (cookies[i].trim() === "letraSumas=grande") {
+            selectorLetra.value = "grande";
+        }
+    }
+    aplicarLetra();
+}
+
+function guardarPreferencia() {
+    aplicarLetra();
+    // max-age son segundos: 30 días. path=/ permite leerla en todo este sitio.
+    // SameSite=Lax limita el envío de esta cookie desde otros sitios.
+    document.cookie = "letraSumas=" + selectorLetra.value + "; max-age=2592000; path=/; SameSite=Lax";
+    const cookies = document.cookie.split(";");
+    let guardada = false;
+    for (let i = 0; i < cookies.length; i = i + 1) {
+        if (cookies[i].trim() === "letraSumas=" + selectorLetra.value) {
+            guardada = true;
+        }
+    }
+    if (guardada) {
+        mensajePreferencia.textContent = "Preferencia guardada durante 30 días.";
+    } else {
+        mensajePreferencia.textContent = "El navegador no ha guardado la preferencia.";
+    }
+}
+
+selectorLetra.addEventListener("change", guardarPreferencia);
+cargarPreferencia();

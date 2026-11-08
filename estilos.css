@@ -37,7 +37,7 @@ button {
     border-radius: 6px;
     background-color: #1d4ed8;
     color: white;
-    font-size: 16px;
+    font: inherit;
     cursor: pointer;
 }
 
@@ -58,7 +58,7 @@ label {
     margin-bottom: 6px;
 }
 
-input {
+input, select {
     display: block;
     width: 100%;
     padding: 10px;

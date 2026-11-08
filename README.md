@@ -14,7 +14,7 @@ Ya se pueden resolver sumas del 1 al 10 y consultar las acertadas en un historia
 Cada acierto da 1 punto. Fallar o saltar una suma no resta puntos.
 El botón Ayuda abre una ventana con las instrucciones, tu nombre y los puntos actuales.
 La partida se recupera al recargar la misma pestaña mediante sessionStorage.
-El récord se conserva con localStorage. Faltan las cookies y la revisión final.
+El récord se conserva con localStorage. La preferencia de letra se conserva con una cookie. Falta la revisión final.
 
 ## Cómo probar este avance
 
@@ -55,7 +55,7 @@ Cuando se añadan cookies, usaremos un servidor local para probarlas correctamen
 - [x] 8. Ventana adicional con información del jugador.
 - [x] 9. Guardado de la partida actual en sessionStorage.
 - [x] 10. Persistencia de récord o progreso en localStorage.
-- [ ] 11. Preferencia guardada y recuperada mediante cookies.
+- [x] 11. Preferencia guardada y recuperada mediante cookies.
 - [ ] 12. Comprobación final, correcciones y documentación.
 
 ## Seguimiento
@@ -126,3 +126,10 @@ elige el mayor entre el récord anterior y los puntos actuales. Nueva partida no
 Prueba dos aciertos, reinicia y comprueba que los puntos sean 0 y el récord siga en 2.
 Cierra y vuelve a abrir el mismo servidor y puerto: el récord debe continuar.
 Si el navegador bloquea el guardado, aparece un aviso y puedes seguir jugando.
+
+## Preferencia con cookies
+
+El selector Tamaño de letra cambia el texto entre 16 y 20 píxeles.
+La cookie letraSumas guarda normal o grande durante 30 días y se lee al abrir la página.
+Prueba Grande, recarga y comprueba que siga seleccionado. Después prueba Normal.
+Nueva partida no borra esta preferencia. Usa HTTP con Live Server, no file://.
