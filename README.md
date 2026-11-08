@@ -188,3 +188,14 @@ Esta revisión cubre los requisitos enumerados en la conversación. El PDF origi
 no está en el repositorio: conviene contrastarlo antes de entregar por si incluye condiciones adicionales.
 No se han modificado fechas ni creado commits vacíos. La entrega en la plataforma del centro
 debe realizarla el alumno antes del 9 de noviembre a las 10:13 (Europe/Madrid).
+
+## Segunda revisión antes de entregar
+
+Se corrigió un caso al jugar en dos pestañas: antes de guardar el récord se vuelve
+a leer localStorage, para conservar un récord superior conseguido en la otra pestaña.
+Prueba: consigue 5 puntos en una pestaña y después 2 en otra; el récord debe seguir en 5.
+
+Se repitieron las pruebas de lógica con DOM y almacenamiento simulados:
+validación, respuestas, bloqueo de puntos duplicados, recuperación de sesión, ayuda,
+preferencia de letra, reinicio, rango de los números y récord entre pestañas.
+La comprobación visual continúa pendiente por las restricciones de Chromium.

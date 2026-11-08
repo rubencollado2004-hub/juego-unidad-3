@@ -270,7 +270,7 @@ function cargarRecord() {
     try {
         const guardado = Number(localStorage.getItem("recordSumas"));
         if (Number.isInteger(guardado) && guardado >= 0) {
-            record = guardado;
+            record = Math.max(record, guardado);
         }
     } catch (error) {
         mensajeRecord.textContent = "No se pudo leer el récord guardado.";
@@ -279,6 +279,8 @@ function cargarRecord() {
 }
 
 function actualizarRecord() {
+    // Otra pestaña puede haber mejorado el récord: lo leemos antes de guardar.
+    cargarRecord();
     // Math.max elige el mayor: una partida con menos puntos no reduce el récord.
     record = Math.max(record, puntuacion);
     textoRecord.textContent = "Récord: " + record;
