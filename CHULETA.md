@@ -1,81 +1,147 @@
 # Chuleta de examen – Juego de sumas (Unidad 3)
 
-Cambios típicos que pueden pedir sobre `juego.js`, `index.html` y `estilos.css`.
-Cada bloque dice **dónde** tocar y **qué** escribir, usando los nombres reales del proyecto.
+Cada cambio dice **dónde va** (función + línea exacta del código original), **qué escribir** y, si hace falta, **qué más adaptar**.
+Los números de línea son los del código original (último commit con código `c457f89`). **Se mueven en cuanto añades código**,
+así que busca el texto entre comillas con **Ctrl+F**. Al final del PDF tienes el código original **con números de línea**.
 
-> ⚠️ **TRAMPA IMPORTANTE – `cargarPartida`**: valida la partida guardada con
-> `Number.isInteger(partida.puntos)`, `partida.puntos === partida.historial.length`
-> y `numero1`/`numero2` entre 1 y 10. Si cambias **puntos decimales**, **restar puntos**,
-> **puntos por acierto** o **rango de números**, quita/adapta esas líneas o al recargar
-> la partida no se recuperará (vuelve el formulario).
-> Lo mismo en `cargarRecord`: `Number.isInteger(guardado)` rechaza récords decimales.
+## Cómo trabajar en el examen
+
+1. Abre el juego con **Live Server** y la consola a la vez (**F12 → Consola**).
+2. Haz un cambio cada vez: guarda, pulsa **F5**, prueba y solo entonces sigue con el siguiente.
+3. La partida queda guardada en `sessionStorage`. Para volver a ver el formulario, pulsa **Nueva partida**.
+4. Si al recargar se pierde la partida, la culpa es de `cargarPartida`, que rechaza los datos guardados que ya no encajan con tu cambio.
+
+> ⚠️ **TRAMPA – `cargarPartida` (líneas 217–223)**: solo acepta partidas con **puntos enteros**, con
+> **`puntos === historial.length`** y con **`numero1`/`numero2` del 1 al 10**. Si cambias los puntos por acierto,
+> pones puntos decimales, restas puntos o cambias el rango, **adapta esas líneas**. Si no, al pulsar F5 vuelve el formulario.
+> `cargarRecord` (línea 272) también exige `Number.isInteger(guardado)`, así que rechaza récords con decimales.
+
+## Mapa del código (juego.js original)
+
+| Línea | Función / dato | Qué hace |
+| --- | --- | --- |
+| 4–23 | `const ... = document.getElementById(...)` | Elementos del HTML |
+| 25 | `EDAD_MINIMA = 12` | Edad mínima |
+| 29–38 | `let` | nombreJugador, edadJugador, numero1, numero2, resuelta, puntuacion, record, historial |
+| 40 | `calcularEdad` | Edad con Date (resta 1 si no ha cumplido) |
+| 55 | `cambiarColorPanel` | Azul si ≥18, verde si no |
+| 65 | `mostrarPanel` | Nombre en mayúsculas y edad |
+| 76 | `validarPerfil` | Valida el formulario, "Acceso denegado"/"permitido" |
+| 120 | `siguienteMision` | Genera la suma con Math.random |
+| 138 | `comprobarRespuesta` | Compara (línea 152), historial, +1 punto, récord |
+| 175 | `abrirAyuda` | window.open + document.write |
+| 192 / 208 | `guardarPartida` / `cargarPartida` | sessionStorage `partidaSumas` |
+| 253 | `reiniciarPartida` | removeItem + reload |
+| 269 / 281 | `cargarRecord` / `actualizarRecord` | localStorage `recordSumas` + Math.max |
+| 303 / 311 / 323 | `aplicarLetra` / `cargarPreferencia` / `guardarPreferencia` | Cookie `letraSumas` 30 días |
+
+index.html: línea 11 es el `<script ... defer>`, la 15 el `<h1>`, la 22 el `</select>`, la 35 "Debes tener al menos 12 años", la 63 el botón Ayuda y la 67 `<p id="historial">`.
 
 ---
 
-## 0. Mapa rápido del código
+## 1. Mostrar info por consola
 
-| Función | Qué hace |
-| --- | --- |
-| `validarPerfil(evento)` | submit del formulario: trim, fecha válida, edad ≥ `EDAD_MINIMA` |
-| `calcularEdad(nacimiento, hoy)` | resta años y descuenta 1 si no ha llegado el cumpleaños |
-| `mostrarPanel()` / `cambiarColorPanel()` | nombre en mayúsculas, edad, color azul (≥18) / verde |
-| `siguienteMision()` | `Math.floor(Math.random() * 10) + 1` para dos números |
-| `comprobarRespuesta(evento)` | compara, `push` al historial, +1 punto, récord, guarda |
-| `abrirAyuda()` | `window.open` + `document.write` + `textContent` |
-| `guardarPartida()` / `cargarPartida()` | `sessionStorage` + `JSON.stringify` / `JSON.parse` |
-| `reiniciarPartida()` | `sessionStorage.removeItem` + `location.reload()` |
-| `cargarRecord()` / `actualizarRecord()` | `localStorage` + `Math.max` |
-| `aplicarLetra()` / `cargarPreferencia()` / `guardarPreferencia()` | cookie `letraSumas` 30 días |
+La consola se ve en **F12 → Consola**, no en la página. `console.log` sirve para datos normales, `console.warn` para avisos, `console.error` para errores y `console.table` para arrays y objetos.
 
-Claves de almacenamiento: `partidaSumas` (session), `recordSumas` (local), cookie `letraSumas`.
+**Edad del jugador**: en `mostrarPanel`, **debajo de la línea 71** `textoEdad.textContent = "Edad: " ...`:
+```js
+console.log("Edad del jugador:", edadJugador);
+```
+
+**Acceso permitido**: en `validarPerfil`, **debajo de la línea 114** `mensaje.textContent = "Acceso permitido. Perfil creado.";`:
+```js
+console.log("Acceso permitido para", nombre);
+```
+
+**Acceso denegado**: ⚠️ **no** lo pongas debajo de la línea 85 (`"Acceso denegado"`), porque esa línea se ejecuta **siempre**: la función empieza denegando. Ponlo **antes de cada `return;`** de `validarPerfil` (**líneas 88, 102 y 107**):
+```js
+console.error("Acceso denegado");
+return;
+```
+
+**Números generados**: en `siguienteMision`, **debajo de la línea 129** `textoSuma.textContent = ...`:
+```js
+console.log(`Nueva suma: ${numero1} + ${numero2} = ${numero1 + numero2}`);
+```
+
+**Acierto y fallo**: en `comprobarRespuesta`. Las dos primeras líneas van **debajo de la línea 161** (`"¡Correcto! ..."`):
+```js
+console.log("Acierto:", numero1 + " + " + numero2 + " = " + respuesta);
+console.table(historial);                 // el array como tabla
+```
+Y esta **debajo de la línea 165** (`"No es correcto. ..."`):
+```js
+console.warn("Fallo: la respuesta correcta era", numero1 + numero2);
+```
+
+**Lo guardado en sessionStorage**: en `guardarPartida`, **debajo de la línea 200** `sessionStorage.setItem(...)`:
+```js
+console.log("Guardado:", sessionStorage.getItem("partidaSumas"));
+console.table(partida);                   // o el objeto como tabla
+```
+
+**Errores al guardar o leer**: dentro de los `catch (error) {` (**líneas 202, 248, 258, 275 y 290**): `console.error(error);`
+
+**Cookies**: en `cargarPreferencia`, **debajo de la línea 320** `aplicarLetra();`: `console.log("Cookies:", document.cookie);`
+
+Otros: `console.info("...")`, `console.group("Misión"); ... console.groupEnd();`, `console.count("aciertos")`, `console.time("t"); ... console.timeEnd("t")` y `console.clear()`.
 
 ---
 
-## 1. Redondear la puntuación (Math)
+## 2. Redondear la puntuación (Math)
 
-| Método | 2.5 | 2.4 | -2.5 | Uso |
+| Método | 2.5 | 2.4 | -2.5 | Qué hace |
 | --- | --- | --- | --- | --- |
 | `Math.round(x)` | 3 | 2 | -2 | al más cercano |
 | `Math.floor(x)` | 2 | 2 | -3 | hacia abajo |
 | `Math.ceil(x)` | 3 | 3 | -2 | hacia arriba |
-| `Math.trunc(x)` | 2 | 2 | -2 | quita decimales |
-| `x.toFixed(2)` | "2.50" | "2.40" | "-2.50" | **devuelve String**, para mostrar |
+| `Math.trunc(x)` | 2 | 2 | -2 | quita los decimales |
+| `x.toFixed(2)` | "2.50" | "2.40" | "-2.50" | **devuelve String** (solo para mostrar) |
 
-Redondear a 2 decimales como número: `Math.round(x * 100) / 100`.
+Para redondear a 2 decimales y seguir teniendo un número: `Math.round(x * 100) / 100`.
 
-**Ejemplo: puntos con bonus aleatorio y redondeo** (en `comprobarRespuesta`, sustituye la línea `puntuacion = puntuacion + 1;`):
-
+**Puntos con bonus aleatorio redondeado a 1 decimal**: en `comprobarRespuesta`, **sustituye las líneas 159 y 160** (`puntuacion = puntuacion + 1;` y la de `textoPuntuacion`):
 ```js
-const bonus = Math.random();                 // 0 … 0.999
-puntuacion = Math.round((puntuacion + 1 + bonus) * 10) / 10; // 1 decimal
+const bonus = Math.random();                                   // 0 … 0.999
+puntuacion = Math.round((puntuacion + 1 + bonus) * 10) / 10;   // 1 decimal
 textoPuntuacion.textContent = "Puntos: " + puntuacion.toFixed(1);
+```
+y la línea 161 (el mensaje):
+```js
 mensajeJuego.textContent = "¡Correcto! +" + (1 + bonus).toFixed(1) + " puntos.";
 ```
-Adaptar: en `cargarPartida` cambiar `!Number.isInteger(partida.puntos)` por
-`typeof partida.puntos !== "number"` y **borrar** `partida.puntos !== partida.historial.length`.
-En `cargarRecord` cambiar `Number.isInteger(guardado)` por `!isNaN(guardado)`.
+Adapta también:
+- `cargarPartida`, **línea 219**: cambia `!Number.isInteger(partida.puntos)` por `typeof partida.puntos !== "number"`.
+- **Línea 223**: borra `partida.puntos !== partida.historial.length` y deja `!Array.isArray(partida.historial)) {` al final de la línea 222.
+- `cargarRecord`, **línea 272**: cambia `Number.isInteger(guardado)` por `!isNaN(guardado)`.
 
-**Puntos según dificultad** (suma grande da más): `puntuacion += Math.ceil((numero1 + numero2) / 5);`
+**Puntos según la dificultad** (las sumas grandes dan más): sustituye la línea 159 por `puntuacion = puntuacion + Math.ceil((numero1 + numero2) / 5);` y quita la condición de la línea 223.
 
-**Restar al fallar** (en el `else` de `comprobarRespuesta`):
+**Otro redondeo para los números del 1 al 10** (líneas 127–128):
 ```js
-puntuacion = Math.max(0, puntuacion - 1);    // nunca negativo
-textoPuntuacion.textContent = "Puntos: " + puntuacion;
-guardarPartida();
+numero1 = Math.ceil(Math.random() * 10);       // ceil hacia arriba
+numero1 = Math.round(Math.random() * 9) + 1;   // round al más cercano
 ```
-(Quitar `partida.puntos !== partida.historial.length` en `cargarPartida`.)
 
 ---
 
-## 2. Fechas (Date)
+## 3. Fechas (Date)
 
-Métodos: `getFullYear()`, `getMonth()` (**0 = enero**, sumar 1 para mostrar), `getDate()` (día del mes),
-`getDay()` (día de la semana, **0 = domingo**), `getHours()`, `getMinutes()`, `getSeconds()`,
-`getTime()` (ms desde 1970), `setHours(0,0,0,0)`, `toLocaleDateString()`, `toLocaleTimeString()`.
+Métodos de Date:
+- `getFullYear()`: el año.
+- `getMonth()`: el mes, **de 0 a 11** (suma 1 para mostrarlo).
+- `getDate()`: el día del mes.
+- `getDay()`: el día de la semana, **0 = domingo**.
+- `getHours()`, `getMinutes()`, `getSeconds()`: hora, minutos y segundos.
+- `getTime()`: milisegundos desde 1970.
+- `toLocaleDateString("es-ES")` y `toLocaleTimeString("es-ES")`: fecha y hora con formato español.
 
-**Mostrar la fecha actual** – en `index.html` debajo del `<h1>`: `<p id="fecha-actual"></p>`
-y en `juego.js` (al final):
-
+**Mostrar la fecha actual**. Son dos partes.
+- En `index.html`, **debajo de la línea 15** `<h1>Juego de misiones</h1>`:
+```html
+<p id="fecha-actual"></p>
+```
+- **Al final de `juego.js`**:
 ```js
 const textoFecha = document.getElementById("fecha-actual");
 function mostrarFechaActual() {
@@ -86,149 +152,167 @@ function mostrarFechaActual() {
 }
 mostrarFechaActual();
 ```
-
-Formato manual `dd/mm/aaaa`:
+Formato manual `dd/mm/aaaa` (para meterlo dentro de la función, en lugar de la línea de `toLocaleDateString`):
 ```js
-const d = new Date();
-const dia = String(d.getDate()).padStart(2, "0");
-const mes = String(d.getMonth() + 1).padStart(2, "0");   // +1 !!
-textoFecha.textContent = dia + "/" + mes + "/" + d.getFullYear();
+const dia = String(ahora.getDate()).padStart(2, "0");
+const mes = String(ahora.getMonth() + 1).padStart(2, "0");   // ¡+1!
+textoFecha.textContent = "Hoy es " + dia + "/" + mes + "/" + ahora.getFullYear();
 ```
 
-**Reloj que se actualiza cada segundo:**
+**Reloj que se actualiza cada segundo** (al final de `juego.js`, tras lo anterior):
 ```js
 setInterval(function () {
-    textoFecha.textContent = new Date().toLocaleTimeString("es-ES");
+    textoFecha.textContent = new Date().toLocaleString("es-ES");   // fecha y hora
 }, 1000);
 ```
 
-**Fecha/hora en cada acierto del historial** (en `comprobarRespuesta`):
+**Hora de cada acierto en el historial**: en `comprobarRespuesta`, **sustituye la línea 156**:
 ```js
 const hora = new Date().toLocaleTimeString("es-ES");
 historial.push(numero1 + " + " + numero2 + " = " + respuesta + " (" + hora + ")");
 ```
 
-**Días que faltan para su cumpleaños** (guardar `nacimiento` en `validarPerfil`):
+**Día de la semana y año en que nació**: en `validarPerfil`, **debajo de la línea 105** `const edad = calcularEdad(nacimiento, hoy);`:
 ```js
-function diasHastaCumple(nacimiento) {
-    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
-    let cumple = new Date(hoy.getFullYear(), nacimiento.getMonth(), nacimiento.getDate());
-    if (cumple < hoy) cumple.setFullYear(hoy.getFullYear() + 1);
-    return Math.round((cumple - hoy) / (1000 * 60 * 60 * 24));
-}
+const diasSemana = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+console.log("Naciste un " + diasSemana[nacimiento.getDay()] + " del año " + nacimiento.getFullYear());
 ```
 
-**Cambiar edad mínima**: `const EDAD_MINIMA = 16;` + texto de `index.html` ("al menos 16 años").
-**Edad máxima**: en `validarPerfil` tras calcular la edad: `if (edad < EDAD_MINIMA || edad > 99) return;`
+**Días que faltan para su cumpleaños**: va en el mismo sitio (debajo de la línea 105):
+```js
+let cumple = new Date(hoy.getFullYear(), nacimiento.getMonth(), nacimiento.getDate());
+if (cumple < hoy) {
+    cumple.setFullYear(hoy.getFullYear() + 1);
+}
+const dias = Math.round((cumple - hoy) / (1000 * 60 * 60 * 24));
+console.log("Faltan " + dias + " días para tu cumpleaños");
+```
+
+**Edad mínima**: cambia la **línea 25** `const EDAD_MINIMA = 14;` y la **línea 35 de index.html** ("al menos 14 años").
+**Edad máxima**: en la **línea 106**, cambia `if (edad < EDAD_MINIMA) {` por `if (edad < EDAD_MINIMA || edad > 99) {`.
 
 ---
 
-## 3. Modificar el color de fondo (style / classList)
+## 4. Modificar el color de fondo y otros estilos
 
-Toda la página: `document.body.style.backgroundColor = "#fde68a";`
-Solo la caja blanca: `document.querySelector("main").style.backgroundColor = "lightyellow";`
+Se cambian con `elemento.style.propiedad = "valor"` (en camelCase): `backgroundColor`, `color`, `borderColor`, `fontSize`.
+- `document.body` cambia **toda la página**.
+- `document.querySelector("main")` cambia **la caja blanca**.
+- `panelJugador` cambia **solo el perfil**.
 
-**Más tramos de edad** en `cambiarColorPanel`:
+**Menor de edad: fondo de la página rojo y aviso por consola**. Sustituye `cambiarColorPanel` entera (**líneas 55–63**):
 ```js
-if (edadJugador >= 65) {
-    panelJugador.style.backgroundColor = "#fef3c7";   // amarillo
-} else if (edadJugador >= 18) {
-    panelJugador.style.backgroundColor = "#dbeafe";   // azul
-} else {
-    panelJugador.style.backgroundColor = "#dcfce7";   // verde
+function cambiarColorPanel() {
+    if (edadJugador >= 18) {
+        panelJugador.style.backgroundColor = "#dbeafe";   // Azul claro.
+        console.log("Es mayor de edad");
+    } else {
+        panelJugador.style.backgroundColor = "#dcfce7";   // Verde claro.
+        document.body.style.backgroundColor = "#fecaca";  // Página rojo claro.
+        console.log("Es menor de edad");
+    }
 }
 ```
 
-**Fondo según acierto/fallo** (en `comprobarRespuesta`):
+**Tres tramos de edad, color del texto y borde según el nombre** (otra versión de la misma función):
 ```js
-document.body.style.backgroundColor = "#bbf7d0";   // en el if (acierto)
-document.body.style.backgroundColor = "#fecaca";   // en el else (fallo)
-```
-
-**Color aleatorio:**
-```js
-function colorAleatorio() {
-    const r = Math.floor(Math.random() * 256);
-    const g = Math.floor(Math.random() * 256);
-    const b = Math.floor(Math.random() * 256);
-    document.body.style.backgroundColor = "rgb(" + r + ", " + g + ", " + b + ")";
+function cambiarColorPanel() {
+    if (edadJugador >= 18) {
+        panelJugador.style.backgroundColor = "#dbeafe";   // Azul: mayor de edad.
+        panelJugador.style.color = "#1e3a8a";             // Texto azul oscuro.
+    } else if (edadJugador >= 15) {
+        panelJugador.style.backgroundColor = "#fef9c3";   // Amarillo: 15-17.
+    } else {
+        panelJugador.style.backgroundColor = "#dcfce7";   // Verde: 12-14.
+    }
+    if (nombreJugador.length > 6) {
+        panelJugador.style.borderColor = "red";           // Borde según el nombre.
+    }
 }
 ```
 
-**Selector de color del usuario** – HTML: `<input id="color-fondo" type="color" value="#eef2f6">`
+**Fondo verde al acertar y rojo al fallar**: en `comprobarRespuesta`, la primera línea va **debajo de la línea 161** y la segunda **debajo de la línea 165**:
+```js
+document.body.style.backgroundColor = "#bbf7d0";   // acierto
+document.body.style.backgroundColor = "#fecaca";   // fallo
+```
+
+**Puntos en verde al llegar a 5**: **debajo de la línea 161**:
+```js
+if (puntuacion >= 5) {
+    textoPuntuacion.style.color = "green";
+}
+```
+
+**Color aleatorio** (por ejemplo **debajo de la línea 129**, en cada suma nueva):
+```js
+const r = Math.floor(Math.random() * 256);
+const g = Math.floor(Math.random() * 256);
+const b = Math.floor(Math.random() * 256);
+document.body.style.backgroundColor = "rgb(" + r + ", " + g + ", " + b + ")";
+```
+
+**Selector de color del usuario**. Son dos partes.
+- En `index.html`, **debajo de la línea 22** (el `</select>` del tamaño de letra):
+```html
+<label for="color-fondo">Color de fondo</label>
+<input id="color-fondo" type="color" value="#eef2f6">
+```
+- **Al final de `juego.js`**:
 ```js
 const selectorColor = document.getElementById("color-fondo");
 selectorColor.addEventListener("input", function () {
     document.body.style.backgroundColor = selectorColor.value;
+    localStorage.setItem("colorFondo", selectorColor.value);   // opcional: recordarlo
 });
+const colorGuardado = localStorage.getItem("colorFondo");
+if (colorGuardado) {
+    document.body.style.backgroundColor = colorGuardado;
+    selectorColor.value = colorGuardado;
+}
 ```
 
-**Con clases CSS** – en `estilos.css`: `.oscuro { background-color: #111827; color: white; }`
-```js
-document.body.classList.toggle("oscuro");   // add / remove / toggle / contains
-```
-
-Guardar el color elegido (persistente): `localStorage.setItem("colorFondo", selectorColor.value);`
-y al cargar: `const c = localStorage.getItem("colorFondo"); if (c) document.body.style.backgroundColor = c;`
-
----
-
-## 4. Mostrar info por consola (F12 → Console)
-
-```js
-console.log("Jugador:", nombreJugador, "Edad:", edadJugador);
-console.info("Partida recuperada");
-console.warn("Respuesta vacía");
-console.error("No se pudo guardar", error);       // dentro de los catch
-console.table(historial);                          // arrays/objetos en tabla
-console.table({ nombre: nombreJugador, puntos: puntuacion, record: record });
-console.group("Misión"); console.log(numero1, numero2); console.groupEnd();
-console.count("aciertos");                         // cuenta las veces que se llama
-console.time("respuesta"); /* … */ console.timeEnd("respuesta");
-console.clear();
-```
-Sitios típicos: final de `validarPerfil` (perfil válido), `siguienteMision` (números generados),
-`comprobarRespuesta` (respuesta y si es correcta), `guardarPartida` (`console.log(partida)`),
-los `catch (error)` → `console.error(error)`.
-Plantilla literal: `` console.log(`Suma: ${numero1} + ${numero2} = ${numero1 + numero2}`); ``
+**Con una clase CSS**. En `estilos.css` añade `.oscuro { background-color: #111827; color: white; }` y en JS: `document.body.classList.toggle("oscuro");` (también existen `add`, `remove` y `contains`).
 
 ---
 
 ## 5. Obtener y modificar elementos del DOM
 
-**Obtener:**
+| Obtener | Devuelve |
+| --- | --- |
+| `document.getElementById("mensaje")` | el elemento con ese id |
+| `document.querySelector("#panel-jugador h2")` | el **primero** que cumple el selector CSS |
+| `document.querySelectorAll("button")` | todos los que lo cumplen (se recorren con `forEach`) |
+| `document.getElementsByTagName("p")` / `getElementsByClassName("x")` | colecciones |
+
+| Modificar | Para qué |
+| --- | --- |
+| `el.textContent = "..."` | texto (seguro, no interpreta HTML) |
+| `el.innerHTML = "<b>..</b>"` | HTML (nunca con datos que escribe el usuario) |
+| `el.style.color = "red"` | estilos |
+| `el.classList.add/remove/toggle("x")` | clases |
+| `el.setAttribute("title", "...")` / `getAttribute` | atributos |
+| `el.hidden = true` | ocultar o mostrar |
+| `input.value`, `boton.disabled = true` | formularios |
+| `document.createElement("p")`, `padre.appendChild(el)`, `el.remove()` | crear y quitar elementos |
+
+**Cambiar el título con el nombre**: en `mostrarPanel`, **debajo de la línea 68**:
 ```js
-document.getElementById("mensaje");
-document.querySelector("#panel-jugador h2");      // el primero que coincide (selector CSS)
-document.querySelectorAll("button");              // NodeList → forEach
-document.getElementsByTagName("p");
-document.getElementsByClassName("clase");
+document.querySelector("h1").textContent = "Juego de " + nombreJugador;
+document.title = "Juego de " + nombreJugador;       // título de la pestaña
 ```
 
-**Modificar:**
+**Longitud del nombre en el panel**: **sustituye la línea 68**:
 ```js
-elemento.textContent = "texto";          // seguro (no interpreta HTML)
-elemento.innerHTML = "<strong>hola</strong>";  // interpreta HTML (no con datos del usuario)
-elemento.style.color = "red";            // propiedades CSS en camelCase
-elemento.classList.add("activo");
-elemento.setAttribute("title", "Ayuda"); elemento.getAttribute("id");
-elemento.hidden = true;                  // ocultar / mostrar
-campoRespuesta.value = "";               // inputs
-botonComprobar.disabled = true;
+textoNombre.textContent = "Jugador: " + nombreJugador.toUpperCase() + " (" + nombreJugador.length + " letras)";
 ```
 
-**Crear / eliminar:**
-```js
-const nuevo = document.createElement("p");
-nuevo.textContent = "Nuevo párrafo";
-document.querySelector("main").appendChild(nuevo);   // o append / prepend
-nuevo.remove();
-```
-
-**Historial como lista `<ul>` en vez de `join`** – HTML: cambiar `<p id="historial">` por `<ul id="historial"></ul>`
+**Historial como lista `<ul>` en lugar de `join`**:
+- En `index.html`, **sustituye la línea 67** por `<ul id="historial"></ul>`.
+- En `juego.js`, **al final**:
 ```js
 function pintarHistorial() {
-    textoHistorial.innerHTML = "";                 // vaciar
+    textoHistorial.innerHTML = "";              // vaciar la lista
     historial.forEach(function (suma) {
         const li = document.createElement("li");
         li.textContent = suma;
@@ -236,80 +320,117 @@ function pintarHistorial() {
     });
 }
 ```
-y llamar `pintarHistorial()` donde ahora está `textoHistorial.textContent = historial.join(" | ");`.
+- **Sustituye las líneas 157 y 240** (`textoHistorial.textContent = historial.join(" | ");`) por `pintarHistorial();`.
 
-**Recorrer varios elementos:**
+**Cambiar todos los botones a la vez**: al final de `juego.js`:
 ```js
-document.querySelectorAll("#zona-juego button").forEach(function (b) {
-    b.style.backgroundColor = "#16a34a";
+document.querySelectorAll("#zona-juego button").forEach(function (boton) {
+    boton.style.backgroundColor = "#16a34a";
 });
 ```
 
-**Cambiar el título:** `document.querySelector("h1").textContent = "Juego de " + nombreJugador;`
-**Título de la pestaña:** `document.title = "Puntos: " + puntuacion;`
-
-**Botón creado desde JS con evento:**
+**Botón nuevo "Pista" (el resultado es par o impar)**:
+- En `index.html`, **debajo de la línea 63** (el botón Ayuda):
+```html
+<button id="boton-pista" type="button">Pista</button>
+```
+- **Al final de `juego.js`**:
 ```js
-const boton = document.createElement("button");
-boton.type = "button";
-boton.textContent = "Borrar récord";
-boton.addEventListener("click", function () {
+const botonPista = document.getElementById("boton-pista");
+function mostrarPista() {
+    // % da el resto de dividir: 0 es par, 1 es impar.
+    if ((numero1 + numero2) % 2 === 0) {
+        mensajeJuego.textContent = "Pista: el resultado es par.";
+    } else {
+        mensajeJuego.textContent = "Pista: el resultado es impar.";
+    }
+}
+botonPista.addEventListener("click", mostrarPista);
+```
+**Receta para cualquier botón**: botón con su `id` en el HTML → `getElementById` → función → `addEventListener("click", función)`.
+
+**Botón creado solo con JavaScript** (sin tocar el HTML), al final de `juego.js`:
+```js
+const botonBorrar = document.createElement("button");
+botonBorrar.type = "button";
+botonBorrar.textContent = "Borrar récord";
+botonBorrar.addEventListener("click", function () {
     localStorage.removeItem("recordSumas");
     record = 0;
     textoRecord.textContent = "Récord: 0";
 });
-zonaJuego.appendChild(boton);
+zonaJuego.appendChild(botonBorrar);
 ```
 
-Eventos útiles: `click`, `submit` (+ `evento.preventDefault()`), `change`, `input`, `keydown`, `load`, `message`, `storage`.
+Eventos: `click`, `submit` (con `evento.preventDefault()`), `change`, `input`, `keydown`, `load`, `DOMContentLoaded`, `message` y `storage`.
 
 ---
 
 ## 6. Cambiar entre localStorage y sessionStorage
 
-| | `sessionStorage` | `localStorage` |
-| --- | --- | --- |
-| Dura | hasta cerrar la pestaña | permanente (hasta borrarlo) |
-| Ámbito | solo esa pestaña | todas las pestañas del mismo origen |
-| Ahora guarda | la partida (`partidaSumas`) | el récord (`recordSumas`) |
+| | `sessionStorage` | `localStorage` | Cookie |
+| --- | --- | --- | --- |
+| Dura | mientras la pestaña siga abierta | hasta que se borre | hasta `max-age` |
+| Ámbito | solo esa pestaña | todas las pestañas del sitio | se envía al servidor |
+| En tu juego | `partidaSumas` | `recordSumas` | `letraSumas` |
 
-API idéntica: `setItem(clave, texto)`, `getItem(clave)`, `removeItem(clave)`, `clear()`, `length`, `key(i)`.
-**Solo guarda texto** → objetos con `JSON.stringify` / `JSON.parse`; números con `String` / `Number`.
+Todos usan los mismos métodos: `setItem(clave, texto)`, `getItem(clave)`, `removeItem(clave)` y `clear()`. **Solo guardan texto**: los objetos se pasan con `JSON.stringify` / `JSON.parse` y los números con `String` / `Number`.
+Para verlo: **F12 → Aplicación → Almacenamiento de sesión / Almacenamiento local / Cookies.**
 
-**Partida permanente** (que siga al cerrar el navegador): cambiar `sessionStorage` por `localStorage` en
-`guardarPartida`, `cargarPartida` y `reiniciarPartida` (3 sitios). Texto del mensaje: "Partida guardada en este navegador."
+**Que la partida siga al cerrar el navegador** (de session a local): cambia `sessionStorage` por `localStorage` en **3 líneas**:
+- **Línea 200** (`guardarPartida`): `localStorage.setItem("partidaSumas", ...)`
+- **Línea 210** (`cargarPartida`): `localStorage.getItem("partidaSumas")`
+- **Línea 256** (`reiniciarPartida`): `localStorage.removeItem("partidaSumas")`
+- Y el mensaje de la **línea 201**: `"Partida guardada en este navegador."`
 
-**Récord solo de la sesión:** cambiar `localStorage` por `sessionStorage` en `cargarRecord` y `actualizarRecord` (2 sitios).
+**Récord solo durante la sesión** (de local a session): cambia `localStorage` por `sessionStorage` en **2 líneas**:
+- **Línea 271** (`cargarRecord`): `sessionStorage.getItem("recordSumas")`
+- **Línea 288** (`actualizarRecord`): `sessionStorage.setItem("recordSumas", ...)`
 
-**Truco limpio:** una variable para elegir el almacén:
+**Truco**: declara una variable arriba (debajo de la línea 25), `const almacen = localStorage;`, y usa `almacen.setItem(...)`. Así solo cambias una palabra.
+
+**Guardar el último jugador**: en `validarPerfil`, **debajo de la línea 111** `nombreJugador = nombre;`:
 ```js
-const almacen = localStorage;   // o sessionStorage
-almacen.setItem("partidaSumas", JSON.stringify(partida));
+localStorage.setItem("ultimoJugador", nombre);
+```
+Para rellenar el campo al abrir la página, al final de `juego.js`:
+```js
+campoNombre.value = localStorage.getItem("ultimoJugador") || "";
 ```
 
-**Borrar todo:** `localStorage.clear(); sessionStorage.clear();`
-**Ver en el navegador:** F12 → Application (Aplicación) → Storage → Local/Session Storage / Cookies.
+**Borrar todo**: `localStorage.clear(); sessionStorage.clear();`
 
-**Cookies (recordatorio):**
-```js
-document.cookie = "clave=valor; max-age=2592000; path=/";   // crear (30 días)
-document.cookie = "clave=; max-age=0; path=/";              // borrar
-document.cookie.split(";")                                    // leer → array "clave=valor"
-```
+**Cookies**:
+- **Cookie de 7 días**: en la **línea 327** cambia `max-age=2592000` por `max-age=604800` (7 × 24 × 60 × 60) y en la línea 336 pon `"... durante 7 días."`.
+- **Borrar la cookie**: `document.cookie = "letraSumas=; max-age=0; path=/";`
+- **Tercer tamaño de letra**:
+  - En el HTML, debajo de la línea 21: `<option value="enorme">Enorme</option>`.
+  - En `aplicarLetra`, la **línea 306** `} else {` pasa a ser `} else if (selectorLetra.value === "enorme") { document.body.style.fontSize = "24px"; } else {`.
+  - En `cargarPreferencia`, la **línea 316** pasa a ser `if (cookies[i].trim() === "letraSumas=grande" || cookies[i].trim() === "letraSumas=enorme") {` y la 317 a `selectorLetra.value = cookies[i].trim().split("=")[1];`.
 
 ---
 
 ## 7. Mensajes entre ventanas (postMessage)
 
-`otraVentana.postMessage(dato, origenDestino)` envía; quien recibe escucha `window.addEventListener("message", …)`.
-- Desde la principal a la ayuda: `ventana.postMessage(...)` (referencia que devuelve `window.open`).
-- Desde la ayuda a la principal: `window.opener.postMessage(...)`.
-- Comprobar siempre `evento.origin === window.location.origin` y leer `evento.data`.
+- **Enviar**: `otraVentana.postMessage(dato, origen)`.
+- **Recibir**: `window.addEventListener("message", function (evento) { ... evento.data ... })`.
+- **De la principal a la ayuda**: `ventana.postMessage(...)`, usando la referencia que devuelve `window.open`.
+- **De la ayuda a la principal**: `window.opener.postMessage(...)`.
+- **Seguridad**: comprueba siempre `evento.origin === window.location.origin`.
 
-**Versión sin archivos nuevos** (todo en `juego.js`). Sustituir `abrirAyuda` por:
-
+**Más datos en la ventana de ayuda** (sin postMessage):
+- **Línea 177**: `window.open("", "_blank", "width=300,height=250")` cambia el tamaño.
+- **Sustituye las líneas 186–187**:
 ```js
-let ventanaAyuda = null;   // guardamos la referencia para enviar mensajes después
+ventana.document.getElementById("datos").textContent = "Jugador: " + nombreJugador +
+    ". Edad: " + edadJugador + ". Puntos: " + puntuacion + ". Sumas: " + historial.join(", ") + ".";
+```
+
+**Ayuda que se actualiza en directo y responde con postMessage**. Son tres partes.
+
+**Parte 1: sustituye `abrirAyuda` entera (líneas 175–188)** por:
+```js
+let ventanaAyuda = null;   // referencia para enviar mensajes después
 
 function abrirAyuda() {
     ventanaAyuda = window.open("", "_blank", "width=450,height=400");
@@ -320,29 +441,26 @@ function abrirAyuda() {
     ventanaAyuda.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Ayuda</title></head><body><h1>Cómo jugar</h1><p id="datos"></p><button id="saludar">Enviar mensaje al juego</button></body></html>');
     ventanaAyuda.document.close();
 
-    // La ayuda ESCUCHA mensajes de la principal
+    // La ayuda RECIBE mensajes de la principal
     ventanaAyuda.addEventListener("message", function (evento) {
         if (evento.origin !== window.location.origin) return;
         ventanaAyuda.document.getElementById("datos").textContent =
             "Jugador: " + evento.data.nombre + ". Puntos: " + evento.data.puntos;
     });
-
-    // La ayuda ENVÍA un mensaje a la principal (opener)
+    // La ayuda ENVÍA un mensaje a la principal
     ventanaAyuda.document.getElementById("saludar").addEventListener("click", function () {
         ventanaAyuda.opener.postMessage("¡Hola desde la ayuda!", window.location.origin);
     });
-
     enviarDatosAyuda();
 }
 
 function enviarDatosAyuda() {
     if (ventanaAyuda && !ventanaAyuda.closed) {
-        ventanaAyuda.postMessage({ nombre: nombreJugador, puntos: puntuacion },
-                                 window.location.origin);
+        ventanaAyuda.postMessage({ nombre: nombreJugador, puntos: puntuacion }, window.location.origin);
     }
 }
 
-// La principal ESCUCHA mensajes de la ayuda
+// La principal RECIBE mensajes de la ayuda
 window.addEventListener("message", function (evento) {
     if (evento.origin !== window.location.origin) return;
     if (typeof evento.data === "string") {
@@ -350,19 +468,23 @@ window.addEventListener("message", function (evento) {
     }
 });
 ```
-Y en `comprobarRespuesta`, tras sumar el punto, llamar `enviarDatosAyuda();` → la ayuda se actualiza en directo.
-
-**Versión con archivo `ayuda.html` propio** (si lo piden):
+**Parte 2**: en `comprobarRespuesta`, **debajo de la línea 162** `actualizarRecord();`:
 ```js
-// juego.js
-ventanaAyuda = window.open("ayuda.html", "ayuda", "width=450,height=400");
+enviarDatosAyuda();
+```
+**Parte 3**: la línea 190 (`botonAyuda.addEventListener("click", abrirAyuda);`) se queda igual.
+
+**Versión con un archivo `ayuda.html` propio**:
+- En `abrirAyuda`: `ventanaAyuda = window.open("ayuda.html", "_blank", "width=450,height=400");` (quita el `document.write` y el `close`).
+- Al final de `juego.js`:
+```js
 window.addEventListener("message", function (e) {
     if (e.origin !== window.location.origin) return;
-    if (e.data === "lista") enviarDatosAyuda();   // la ayuda avisa cuando ha cargado
+    if (e.data === "lista") enviarDatosAyuda();     // la ayuda avisa cuando ha cargado
 });
 ```
+- `ayuda.html`:
 ```html
-<!-- ayuda.html -->
 <p id="datos"></p>
 <script>
   window.addEventListener("message", function (e) {
@@ -373,99 +495,186 @@ window.addEventListener("message", function (e) {
   window.opener.postMessage("lista", window.location.origin);
 </script>
 ```
-(Hace falta el "lista" porque si se envía antes de que `ayuda.html` cargue, el mensaje se pierde.)
+(El aviso "lista" hace falta porque si envías antes de que `ayuda.html` cargue, el mensaje se pierde.)
 
-**Otras formas de comunicar ventanas/pestañas:**
-- Acceso directo (mismo origen): `ventana.document.getElementById("datos").textContent = …` (lo que ya hace el proyecto).
-- `ventana.close()` cierra la ayuda; `ventana.closed` dice si está cerrada.
-- Entre **pestañas**: evento `storage` (salta en las OTRAS pestañas cuando cambia localStorage):
+**Entre pestañas**:
+- **Evento `storage`**: salta en las **otras** pestañas cuando cambia localStorage.
 ```js
 window.addEventListener("storage", function (e) {
     if (e.key === "recordSumas") textoRecord.textContent = "Récord: " + e.newValue;
 });
 ```
-- `BroadcastChannel`:
+- **BroadcastChannel**:
 ```js
 const canal = new BroadcastChannel("sumas");
 canal.postMessage({ puntos: puntuacion });
 canal.onmessage = function (e) { console.log("Otra pestaña:", e.data); };
 ```
+- **Cerrar la ayuda**: `ventanaAyuda.close()`. Para saber si está cerrada: `ventanaAyuda.closed`.
 
 ---
 
-## 8. Otros cambios probables
+## 8. Cambiar las reglas del juego
 
-**Cambiar la operación a resta / multiplicación** – en `siguienteMision` cambiar `" + "` por `" × "`
-y en `comprobarRespuesta` `numero1 + numero2` por `numero1 * numero2` (y el texto del historial).
-Operación aleatoria:
+**2 puntos por acierto**: hay que tocar tres líneas.
+- **Línea 159**: `puntuacion = puntuacion + 2;`
+- **Línea 161**: `mensajeJuego.textContent = "¡Correcto! Has ganado 2 puntos. Pulsa Siguiente.";`
+- **Línea 223** (`cargarPartida`): `partida.puntos !== partida.historial.length * 2) {`
+
+**Restar 1 punto al fallar, sin bajar de 0**:
+- En `comprobarRespuesta`, **sustituye la línea 165** por:
 ```js
-const operaciones = ["+", "-", "*"];
-operacion = operaciones[Math.floor(Math.random() * operaciones.length)];  // let operacion global
-function resultado() {
-    if (operacion === "+") return numero1 + numero2;
-    if (operacion === "-") return numero1 - numero2;
-    return numero1 * numero2;
-}
+puntuacion = Math.max(0, puntuacion - 1);       // nunca negativo
+textoPuntuacion.textContent = "Puntos: " + puntuacion;
+mensajeJuego.textContent = "No es correcto. Pierdes 1 punto.";
+guardarPartida();
+```
+- En `cargarPartida`, **líneas 222–223**:
+```js
+// ANTES
+typeof partida.resuelta !== "boolean" || !Array.isArray(partida.historial) ||
+    partida.puntos !== partida.historial.length) {
+// DESPUÉS
+typeof partida.resuelta !== "boolean" || !Array.isArray(partida.historial)) {
 ```
 
-**Rango de números** (ej. 1–20): `Math.floor(Math.random() * 20) + 1`.
-Fórmula general entre `min` y `max`: `Math.floor(Math.random() * (max - min + 1)) + min`.
-Adaptar `partida.numero1 > 10` → `> 20` en `cargarPartida`.
+**Números del 1 al 20**: cambia `* 10` por `* 20` en las **líneas 127 y 128**, y en `cargarPartida` cambia `> 10` por `> 20` en las **líneas 220 y 221**.
+Fórmula general: `Math.floor(Math.random() * (max - min + 1)) + min`.
 
-**Límite de intentos:**
+**Multiplicar en vez de sumar**: hay que tocar cuatro sitios.
+- **Línea 129** y **línea 237**: `numero1 + " x " + numero2 + " = ?"`
+- **Línea 152**: `if (respuesta === numero1 * numero2) {`
+- **Línea 156**: `historial.push(numero1 + " x " + numero2 + " = " + respuesta);`
+
+**Límite de 3 intentos**:
+- Debajo de la línea 38: `let intentos = 3;`
+- En `siguienteMision`, debajo de la línea 131 (`resuelta = false;`): `intentos = 3;`
+- **Sustituye la línea 165**:
 ```js
-let intentos = 3;                        // global; en siguienteMision → intentos = 3;
-// en el else de comprobarRespuesta:
 intentos = intentos - 1;
 if (intentos === 0) {
-    mensajeJuego.textContent = "Sin intentos. Era " + (numero1 + numero2);
+    mensajeJuego.textContent = "Sin intentos. Era " + (numero1 + numero2) + ". Pulsa Siguiente.";
     botonComprobar.disabled = true;
 } else {
     mensajeJuego.textContent = "Fallo. Te quedan " + intentos + " intentos.";
 }
 ```
 
-**Temporizador por suma** (`setTimeout` / `clearTimeout`):
+**10 segundos por suma**:
+- Debajo de la línea 38: `let temporizador;`
+- En `siguienteMision`, debajo de la línea 134 (`campoRespuesta.focus();`):
 ```js
-let temporizador;
-// en siguienteMision:
 clearTimeout(temporizador);
 temporizador = setTimeout(function () {
-    mensajeJuego.textContent = "¡Tiempo agotado!";
+    mensajeJuego.textContent = "¡Tiempo agotado! Pulsa Siguiente.";
     botonComprobar.disabled = true;
 }, 10000);
-// en el acierto: clearTimeout(temporizador);
+```
+- Debajo de la línea 153 (`resuelta = true;`): `clearTimeout(temporizador);`
+
+**Ganar al llegar a 10 puntos**: debajo de la línea 161:
+```js
+if (puntuacion >= 10) {
+    mensajeJuego.textContent = "¡Has ganado!";
+    botonSiguiente.disabled = true;
+}
 ```
 
-**Ganar al llegar a X puntos:** `if (puntuacion >= 10) { mensajeJuego.textContent = "¡Has ganado!"; botonComprobar.disabled = true; botonSiguiente.disabled = true; }`
+**Confirmar antes de reiniciar**: en `reiniciarPartida`, **debajo de la línea 253**: `if (!confirm("¿Seguro que quieres empezar de nuevo?")) return;`
 
-**Confirmar antes de reiniciar:** al inicio de `reiniciarPartida`: `if (!confirm("¿Seguro?")) return;`
+**Aviso de nuevo récord**: en `actualizarRecord`, **debajo de la línea 283** `cargarRecord();`:
+```js
+if (puntuacion > record) {
+    console.log("¡Nuevo récord!");
+}
+```
 
-**Aviso de nuevo récord** (en `actualizarRecord`, antes de `record = Math.max(...)`):
-`if (puntuacion > record) mensajeRecord.textContent = "¡Nuevo récord!";` (y quitar la línea que lo vacía).
+**Nombre de al menos 3 letras**: en `validarPerfil`, **línea 87**: `if (nombre.length < 3 || fecha === "" || !campoFecha.validity.valid) {`
 
-**Nombre con primera letra mayúscula** (en `mostrarPanel`):
-`nombreJugador.charAt(0).toUpperCase() + nombreJugador.slice(1).toLowerCase()`
-Otros de String: `length`, `toLowerCase`, `includes`, `indexOf`, `slice`, `substring`, `replace`, `split`, `padStart`, `repeat`.
-
-**Nombre mínimo 3 letras:** en `validarPerfil`: `if (nombre.length < 3) return;`
-
-**Cookie 7 días en vez de 30:** `max-age=604800` (7 × 24 × 60 × 60) y cambiar el texto del mensaje.
-**Tres tamaños de letra:** añadir `<option value="enorme">` y un `else if (selectorLetra.value === "enorme") document.body.style.fontSize = "24px";` (en `cargarPreferencia` comparar también con `"letraSumas=enorme"`).
-
-**Media de puntos / estadísticas** (Number, Math):
-`Math.max(...array)`, `Math.min(...array)`, `Math.abs`, `Math.pow(a, b)`, `Math.sqrt`, `parseInt("12px")`, `parseFloat`, `Number.isNaN`, `isNaN`.
+**Contador de fallos que se conserva al recargar**: hay que tocar cuatro sitios.
+- Debajo de la línea 35: `let fallos = 0;`
+- **Sustituye la línea 165**:
+```js
+fallos = fallos + 1;
+mensajeJuego.textContent = "No es correcto. Fallos: " + fallos;
+guardarPartida();
+```
+- **Línea 196**: `numero1: numero1, numero2: numero2, resuelta: resuelta, historial: historial, fallos: fallos`
+- **Debajo de la línea 233** `historial = partida.historial;`: `fallos = Number(partida.fallos) || 0;`
 
 ---
 
-## 9. Recordatorios rápidos
+## 9. Métodos de String, Date, Math, Number y Array
 
-- `"use strict"` arriba: obliga a declarar variables.
-- `defer` en el `<script>` del `head` → el DOM ya existe cuando se ejecuta el JS.
-- `const` no se reasigna; `let` sí. `===` compara valor y tipo.
-- `evento.preventDefault()` evita que el `submit` recargue la página.
-- `return` corta la función (validaciones).
-- `input.value` siempre es **String** → `Number(...)`.
-- `try { … } catch (error) { … }` → seguir funcionando si falla el almacenamiento.
-- Probar con **Live Server** (cookies y ventanas no van bien con `file://`).
-- Tras cada cambio: F12 → Console para ver errores; Application para ver storage/cookies.
+| Tipo | Método | Qué hace |
+| --- | --- | --- |
+| String | `length` | número de letras |
+| String | `trim()` | quita los espacios de los extremos |
+| String | `toUpperCase()` / `toLowerCase()` | mayúsculas / minúsculas |
+| String | `charAt(0)` / `slice(1)` | primera letra / desde la posición 1 |
+| String | `includes("a")` / `indexOf("a")` | si contiene / en qué posición |
+| String | `split(";")` / `replace("a","b")` / `padStart(2,"0")` | separar / reemplazar / rellenar |
+| Date | `getFullYear()` `getMonth()` `getDate()` `getDay()` | año / mes 0-11 / día / día de la semana 0-6 |
+| Math | `random()` | decimal de 0 a menos de 1 |
+| Math | `floor()` `ceil()` `round()` `trunc()` | redondeos |
+| Math | `max()` `min()` `abs()` `pow(a,b)` `sqrt()` | mayor / menor / sin signo / potencia / raíz |
+| Number | `Number("5")` / `parseInt("12px")` / `parseFloat` | texto → número |
+| Number | `Number.isInteger(5.5)` → false / `isNaN(x)` | comprueba si es entero / si no es un número |
+| Number | `x.toFixed(2)` | 2 decimales (String) |
+| Array | `push(x)` / `pop()` | añade al final / quita el último |
+| Array | `length` / `[0]` / `[length - 1]` | tamaño / primero / último |
+| Array | `join(", ")` / `forEach(f)` / `includes(x)` | une en texto / recorre / si contiene |
+
+**Primera letra mayúscula y el resto minúscula** (en `mostrarPanel`, sustituyendo `nombreJugador.toUpperCase()` en la línea 68):
+`nombreJugador.charAt(0).toUpperCase() + nombreJugador.slice(1).toLowerCase()`
+
+**Última suma resuelta**: debajo de la línea 156: `console.log("Última suma:", historial[historial.length - 1]);`
+⚠️ Si quitas elementos del historial (por ejemplo con `pop`), recuerda que la línea 223 compara los puntos con `historial.length`.
+
+---
+
+## 10. Quitar `defer` (cargar el script sin defer)
+
+Son dos cambios:
+```html
+<!-- index.html, línea 11: antes era <script src="juego.js" defer></script> -->
+<script src="juego.js"></script>
+```
+```js
+// juego.js, debajo de la línea 1 "use strict";
+window.addEventListener("load", function () {
+    // ... TODO el código que ya tenías ...
+});   // ← esta línea va al FINAL del archivo
+```
+**Por qué**: sin `defer` el script se ejecuta antes de que existan los elementos. Entonces `getElementById` devuelve `null` y sale el error *Cannot read properties of null (reading 'addEventListener')*.
+También vale `document.addEventListener("DOMContentLoaded", function () {`, que salta cuando el HTML está listo sin esperar a las imágenes.
+Otra opción: mover el `<script src="juego.js"></script>` al final del `<body>`.
+
+---
+
+## 11. Preguntas de justificación
+
+| Pregunta | Respuesta |
+| --- | --- |
+| ¿Por qué `defer`? | El script está en el `head`; `defer` espera a que el HTML esté listo para que `getElementById` encuentre los elementos. |
+| ¿Para qué `preventDefault()`? | Evita que el formulario recargue la página al enviarse. |
+| ¿Para qué `novalidate`? | Para validar con JS y mostrar nuestro "Acceso denegado" en vez del aviso del navegador. |
+| ¿Para qué `trim()`? | Quita los espacios de los extremos: un nombre de solo espacios queda vacío y se rechaza. |
+| ¿Por qué `return` en `validarPerfil`? | Termina la función para que no siga con datos incorrectos. |
+| ¿Cómo se calcula la edad? | Se restan los años con `getFullYear`; si el cumpleaños de este año no ha llegado (comparando `getMonth` y `getDate`), se resta uno. |
+| ¿Por qué `getMonth` cuenta desde 0? | En Date, enero es 0 y diciembre es 11. |
+| ¿Por qué `textContent` y no `innerHTML`? | `textContent` escribe texto sin interpretar HTML, así que lo que escriba el jugador no se ejecuta. |
+| ¿Cómo salen números del 1 al 10? | `Math.random()` da un decimal de 0 a menos de 1. Al multiplicar por 10 y aplicar `Math.floor` salen enteros de 0 a 9; con `+ 1`, de 1 a 10. |
+| ¿Para qué `resuelta`? | Impide dar el punto dos veces por la misma suma (por ejemplo, pulsando Enter dos veces o al recargar). |
+| ¿Para qué `Number.isInteger`? | Después de `Number(...)`, rechaza respuestas decimales o vacías. |
+| ¿Para qué `Math.max` en el récord? | Conserva el mayor entre el récord anterior y los puntos actuales. |
+| ¿Por qué se vuelve a leer el récord antes de guardarlo? | Por si otra pestaña lo ha mejorado mientras tanto. |
+| ¿Diferencia entre sessionStorage, localStorage y cookie? | sessionStorage dura mientras la pestaña siga abierta; localStorage sigue al cerrar el navegador; la cookie tiene caducidad (`max-age`) y viaja al servidor en las peticiones. |
+| ¿Para qué `JSON.stringify` / `JSON.parse`? | El almacenamiento solo guarda texto: `stringify` convierte el objeto en texto y `parse` lo recupera. |
+| ¿Para qué `try/catch` al guardar? | El navegador puede bloquear el almacenamiento; así se avisa y se puede seguir jugando. |
+| ¿Qué devuelve `window.open`? | La ventana nueva, o `null` si el navegador la bloquea. |
+| ¿Para qué `postMessage`? | Para enviar datos entre ventanas de forma segura, comprobando `evento.origin`. |
+| ¿Diferencia entre `let` y `const`? | `const` no se puede reasignar; `let` sí. |
+| ¿Por qué `===`? | Compara el valor **y** el tipo (`"5" === 5` es false). |
+| ¿Para qué `"use strict"`? | Obliga a declarar las variables y detecta más errores. |
+| ¿Por qué Live Server? | Las cookies necesitan HTTP; con `file://` no funcionan bien. |
