@@ -41,6 +41,7 @@ Usa Live Server también para comprobar las cookies; abrir el archivo directamen
 - index.html: contenido de la página y carga del script en head con defer.
 - estilos.css: aspecto visual.
 - juego.js: perfil, sumas, puntos, ayuda, almacenamiento y preferencia de letra.
+- CHULETA.md / Chuleta_Juego_Unidad3.pdf: chuleta de examen con posibles cambios al código.
 
 ## Avances previstos
 
